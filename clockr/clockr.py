@@ -8,7 +8,7 @@ import time
 import argparse
 import signal
 import random
-from .__version__ import __version__
+from __version__ import __version__
 
 
 def get_args():
@@ -16,10 +16,10 @@ def get_args():
     parser = argparse.ArgumentParser(
         description='Simple curses clock written in Python.\n\
                 Press q to exit.',
-        epilog="Made with help from #linuxmasterrace on Snoonet thanks to n473,\
+        epilog='Made with help from #linuxmasterrace on Snoonet thanks to n473,\
                 thimoteus, AWindowsKrill, timawesomeness, calexil, tirkaz \
                 and somehow R0flcopt3r, with additional help from bdalenoord \
-                and Noremac201.")
+                and Noremac201.')
     parser.add_argument('-V', '-v', '--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument(
@@ -51,10 +51,10 @@ color, dateformat, nodate, twentyfourhourarg = get_args()
 
 
 screen = curses.initscr()
-width = 0
-height = 0
-origin_x = 0
-origin_y = 0
+# width = 0
+# height = 0
+# origin_x = 0
+# origin_y = 0
 glyph = {
     '0': ["  #####   ", " ##   ##  ", "##     ## ", "##     ## ", "##     ## ",
           " ##   ##  ", "  #####   "],
@@ -98,8 +98,6 @@ def getcolor():
         curses.init_pair(1, 0, -1)
         curses.init_pair(2, colors[color], -1)
         curses.init_pair(3, 0, colors[color])
-    else:
-        pass
 
 
 def addstr(y, x, string, color):
@@ -142,9 +140,7 @@ def print_date(now):
     day_line = now.strftime("%A").center(11, " ")
     date_line = now.strftime("%B %d, %Y") if not dateformat \
         else now.strftime(dateformat)
-    if nodate:
-        pass
-    else:
+    if not nodate:
         addstr(8, 0, day_line, curses.color_pair(2))
         addstr(8, len(day_line) + 40, date_line,
                curses.color_pair(2) | curses.A_BOLD)
@@ -184,25 +180,23 @@ signal.signal(signal.SIGTERM, gracefull_exit)
 
 def main():
     """lets run this thing"""
-a = 0
-getcolor()
-win_resize()
-while True:
-    char = screen.getch()
-    if char == curses.KEY_RESIZE:
-        win_resize()
-    elif char in (ord('q'), ord('Q')):
-        break
+    global width, height, origin_x, origin_y, last_t
+    getcolor()
+    win_resize()
+    while True:
+        char = screen.getch()
+        if char == curses.KEY_RESIZE:
+            win_resize()
+        elif char in (ord('q'), ord('q')):
+            gracefull_exit()
 
-    now = date.now()
-    if last_t and now.timetuple()[:6] != last_t.timetuple()[:6]:
-        print_time(now)
-        print_date(now)
+        now = date.now()
+        if last_t and now.timetuple()[:6] != last_t.timetuple()[:6]:
+            print_time(now)
+            print_date(now)
 
-    time.sleep(0.01)
-    last_t = now
-
-gracefull_exit()
+        time.sleep(0.01)
+        last_t = now
 
 
 if __name__ == '__main__':
